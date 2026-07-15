@@ -1,0 +1,17 @@
+$kind: http-request
+name: student_detail
+url: " http://127.0.0.1:8000/student"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+                "name" : "M Haseeb",
+               "reg_No" : "SP25-BSE-002",
+               "father_name" : "Ali khan",
+                "age" : 13,
+                "department" : "computer science",
+                "semester" : "3rd",
+                "cgpa" : 3.8 
+    }
+order: 3535798722638626
