@@ -1,121 +1,11 @@
 from fastapi import Body, FastAPI
+from fastapi import status 
+from fastapi import HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
 
-# Student Managment Api 
-students = []
-@app.get("/")
-def managment_api():
-    return {
-        "message" : "Wellcome to student Management System" 
-    }
-class Student(BaseModel):
-    name : str
-    reg_No : str
-    father_name : str
-    age : int
-    department : str
-    semester : str
-    cgpa : float
 
-@app.get("/student")
-def student_detail():
-    return {
-        "student_detail" : students
-    }
-@app.post("/student")
-def create_student(std : Student):
-    students.append(std.model_dump())
-    return{
-        "messege" : "student Added Successfully ",
-        "student" : std
-    }
-
-
-    
-@app.put("/student/{reg_no}")
-def update_student(reg_no, update_std : Student):
-    
-    for std in students :
-        if std["reg_No"] == reg_no :
-            std.update(update_std.model_dump())
-            return{
-                "message" : "student detail Updated Successfully" ,
-                "student" : std
-            }
-        
-    return{
-        "message" : "student not found" 
-    }
-
-@app.delete("/student/{reg_no}")
-def delete_student(reg_no : str):
-    for std in students:
-
-        if std["reg_No"] == reg_no :
-            std.remove(std)
-            return{
-                "messege" : "student deleted SuccessFully",
-                 "student" : std
-            }
-    return {
-        "message" : "student not found "
-    }
-
-# Library Mangement System 
-book_store = []
-@app.get("/")
-def library():
-    return{
-        "message" : "Wellcome to Library Management System"
-    }
-class Book(BaseModel):
-    book_id: str
-    title: str
-    author: str
-    price: float
-    available: bool
-
-@app.get("/book")
-def get_book():
-    return {
-        "message" : "All Book Detail",
-        "Data" : book_store
-    }
-@app.post("/book")
-def create_book(b : Book):
-    book_store.append(b.model_dump())
-    return {
-        "message" : "Book Added to Library Successfully ",
-        "detail" : b
-    }
-@app.put("/book/{id}")
-def update_book(id ,book :Book):
-    for b in book_store:
-        if b["book_id"] == id:
-            b.update(book.model_dump())
-            return{
-                "message" : "Book Detail updated Successfully",
-                "updated-detai" : book.model_dump()
-            }
-        
-    return {
-        "message" : "Book not found "
-    }
-
-@app.delete("/book/{id}")
-def delete_book(id :str):
-    for book in book_store:
-        if book["book_id"] == id :
-            book_store.remove(book)
-            return{
-                "message" : "Book deleted SuccessFully ",
-                "detai" : book
-            }
-    return{
-        "message" : "Book Not founded "
-    }
 # -----------------------------
 # Movie Management System
 # -----------------------------
@@ -143,7 +33,7 @@ def home():
 # -----------------------------
 # GET ALL MOVIES
 # -----------------------------
-@app.get("/movies")
+@app.get("/movies",status_code = status.HTTP_200_OK)
 def get_movies():
     return {
         "message": "All Movies",
@@ -154,7 +44,7 @@ def get_movies():
 # -----------------------------
 # GET MOVIE BY ID
 # -----------------------------
-@app.get("/movies/{movie_id}")
+@app.get("/movies/{movie_id}", status_code= status.HTTP_200_OK)
 def get_movie_by_id(movie_id: str):
     for movie in movie_store:
         if movie["movie_id"] == movie_id:
@@ -163,15 +53,16 @@ def get_movie_by_id(movie_id: str):
                 "data": movie
             }
 
-    return {
-        "message": "Movie not found"
-    }
+    raise HTTPException(
+        status_code = status.HTTP_404_NOT_FOUND,
+        detail = "Movies Not Found "
+    )
 
 
 # -----------------------------
 # GET MOVIES BY GENRE
 # -----------------------------
-@app.get("/movies/genre/{genre}")
+@app.get("/movies/genre/{genre}", status_code = status.HTTP_200_OK)
 def get_movies_by_genre(genre: str):
     movies = []
 
@@ -184,16 +75,16 @@ def get_movies_by_genre(genre: str):
             "message": "Movies Found",
             "data": movies
         }
-
-    return {
-        "message": "No movies found"
-    }
+    raise HTTPException(
+        status_code= status.HTTP_404_NOT_FOUND,
+        detail = "Movies Not Found"
+    )
 
 
 # -----------------------------
 # GET AVAILABLE MOVIES
 # -----------------------------
-@app.get("/movies/available/{available}")
+@app.get("/movies/available/{available}", status_code= status.HTTP_200_OK)
 def get_available_movies(available: bool):
     movies = []
 
@@ -210,7 +101,7 @@ def get_available_movies(available: bool):
 # -----------------------------
 # GET MOVIES BY MINIMUM RATING
 # -----------------------------
-@app.get("/movies/rating/{rating}")
+@app.get("/movies/rating/{rating}", status_code = status.HTTP_200_OK)
 def get_movies_by_rating(rating: float):
     movies = []
 
@@ -227,7 +118,7 @@ def get_movies_by_rating(rating: float):
 # -----------------------------
 # GET TOTAL MOVIES
 # -----------------------------
-@app.get("/movies/count")
+@app.get("/movies/count" , status_code= status.HTTP_200_OK)
 def total_movies():
     return {
         "total_movies": len(movie_store)
@@ -237,7 +128,7 @@ def total_movies():
 # -----------------------------
 # CREATE MOVIE
 # -----------------------------
-@app.post("/movies", status_code=201)
+@app.post("/movies", status_code = status.HTTP_200_OK)
 def create_movie(movie: Movie):
     movie_store.append(movie.model_dump())
 
@@ -250,7 +141,7 @@ def create_movie(movie: Movie):
 # -----------------------------
 # UPDATE MOVIE
 # -----------------------------
-@app.put("/movies/{movie_id}")
+@app.put("/movies/{movie_id}" ,status_code =  status.HTTP_200_OK)
 def update_movie(movie_id: str, updated_movie: Movie):
 
     for movie in movie_store:
@@ -262,10 +153,10 @@ def update_movie(movie_id: str, updated_movie: Movie):
                 "data": movie
             }
 
-    return {
-        "message": "Movie not found"
-    }
-
+    raise HTTPException(
+        status_code= status.HTTP_404_NOT_FOUND,
+        detail = "Movie Not Found"
+    )
 
 # -----------------------------
 # DELETE MOVIE
@@ -282,6 +173,7 @@ def delete_movie(movie_id: str):
                 "data": movie
             }
 
-    return {
-        "message": "Movie not found"
-    }
+    raise HTTPException(
+        status_code = status.HTTP_404_NOT_FOUND,
+        detail = "Movie not found"
+    )
