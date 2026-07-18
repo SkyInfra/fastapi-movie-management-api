@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
+from utils import hash
 import models
 import schemas
 from database import engine, get_db
@@ -170,3 +170,26 @@ def delete_movie(id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Movie Deleted Successfully"}
+
+
+@app.post(
+    "/user",
+    status_code=status.HTTP_201_CREATED,
+    response_model=schemas.UserResponse
+)
+def create_user(
+    user: schemas.CreateUser,
+    db: Session = Depends(get_db)
+):
+    hash_password = hash(user.password)
+
+    new_user = models.User(
+        email = user.email,
+        password = hash_password
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user

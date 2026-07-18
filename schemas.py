@@ -1,5 +1,4 @@
-from pydantic import BaseModel
-
+from pydantic import BaseModel , EmailStr
 
 class MovieBase(BaseModel):
     title: str
@@ -19,3 +18,17 @@ class MovieResponse(MovieBase):
 
     class Config:
         from_attributes = True
+
+
+class CreateUser(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class UserResponse(BaseModel):
+    user_id: int
+    email: EmailStr
+
+    class Config:
+        from_attributes = True
+
