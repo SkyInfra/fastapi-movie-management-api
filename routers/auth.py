@@ -1,7 +1,7 @@
 print("AUTH ROUTER LOADED")
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
+from oauth2 import create_access_token
 import models
 import schemas
 from database import get_db
@@ -33,6 +33,11 @@ def login(user: schemas.UserLogin,
             detail="Invalid Credentials"
         )
 
+    access_token = create_access_token(
+    data={"user_id": db_user.user_id}
+)
+
     return {
-        "message": "Login Successful"
+        "access_token": access_token,
+        "token_type": "bearer"
     }
